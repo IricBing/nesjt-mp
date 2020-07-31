@@ -6,8 +6,6 @@
     "dist",
     "index.ts",
     "**/*.d.ts",
-    "**/*spec.ts",
-    "src/main.ts",
-    "src/app.module.ts"
+    "**/*spec.ts"
   ]
 }

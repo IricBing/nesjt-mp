@@ -5,14 +5,14 @@
 外部人员仅供参考，请不要用于生产环境，因此导致的事故后果请自行承担。
 
 ### 安装
-`$ npm i @iricbing/nestjs-mp` <br />
+`$ npm i @lantsang/nestjs-mp` <br />
 or <br />
-`$ yarn add @iricbing/nestjs-mp`<br />
+`$ yarn add @lantsang/nestjs-mp`<br />
 推荐使用yarn
 
 ### 配置
 ```typescript
-import { MpModule } from '@iricbing/nestjs-mp'
+import { MpModule } from '@lantsang/nestjs-mp'
 
 @Module({
   imports: [
@@ -35,7 +35,7 @@ import { SystemLogAppender } from "../../log/constants/log.constant";
 import { LogService } from "../../log/services/log.service";
 import { LoginMpReqDto } from "../dtos/mp/login.mp.req.dto";
 import { LoginMpResDto } from "../dtos/mp/login.mp.res.dto";
-import { MpService } from "@iricbing/nestjs-mp";
+import { MpService } from "@lantsang/nestjs-mp";
 
 @ApiTags('user')
 @Controller('mp/users')
