@@ -1,6 +1,6 @@
 {
   "name": "@lantsang/nestjs-mp",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "自用nestjs 小程序插件",
   "author": "Iric<iricbing@gmail.com>",
   "license": "MIT",
