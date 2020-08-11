@@ -4,6 +4,7 @@
         "Iric",
         "appid",
         "errcode",
+        "errmsg",
         "iricbing",
         "lantsang",
         "nestjs",

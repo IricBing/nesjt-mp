@@ -3,6 +3,7 @@
 *.ts
 config
 src
+test
 .env
 
 # definitions

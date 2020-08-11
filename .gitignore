@@ -2,6 +2,9 @@
 /dist
 /node_modules
 
+# access_token文本
+/src/utils/access_token.txt
+
 # Logs
 logs
 *.log
