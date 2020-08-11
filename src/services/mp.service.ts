@@ -4,8 +4,11 @@ import { IConfig } from "../interfaces/config.interface";
 import { ConfigProvider } from "../constants/common.constant";
 import { IMpUserInfo } from "../interfaces/mp-user-info.interface";
 import { IResolveMpTempCodeRes } from "../interfaces/resolve-mp-temp-code.res.interface";
-import { MpAuthUrl } from "../constants/mp.constant";
+import { MpAuthUrl, ImageSecurityCheckUrl } from "../constants/mp.constant";
 import { IricUtil } from "../utils/iric.util";
+import { ICheckImageSecurityRes } from "../interfaces/check-image-security-res.interface";
+import * as FormData from 'form-data'
+import { v4 as uuid } from 'uuid'
 
 @Injectable()
 export class MpService {
@@ -48,6 +51,33 @@ export class MpService {
       const userInfo = this.mpUtil.decryptData(this.config.appId, data.session_key, encryptedData, iv);
 
       return { success: true, userInfo }
+    } catch (error) {
+      return {
+        success: false,
+        errorMessage: this.iricUtil.parseError(error)
+      }
+    }
+  }
+
+  /**
+   * 检查图片是否安全合法
+   * @param media 图片Buffer信息
+   */
+  async imageSecurityCheck(media: Buffer): Promise<{ success: boolean, security?: boolean, errorMessage?: string }> {
+    try {
+      const form = new FormData();
+      form.append('type', 'image')
+      form.append('media', media, uuid())
+      const { data } = await this.httpService.post<ICheckImageSecurityRes>(ImageSecurityCheckUrl, form, {
+        params: { access_token: await this.mpUtil.getAccessToken() },
+        headers: Object.assign({ 'Content-Length': form.getLengthSync() }, form.getHeaders())
+      }).toPromise();
+
+      return {
+        success: true,
+        security: data.errcode ? false : true,
+        errorMessage: data.errcode ? data.errmsg : undefined
+      }
     } catch (error) {
       return {
         success: false,

@@ -5,8 +5,8 @@ import { MpModule } from "./mp.module";
 @Module({
   imports: [
     MpModule.forRoot({
-      appId: 'hello',
-      appSecret: 'word'
+      appId: 'wxb5ebf49003e967e3',
+      appSecret: 'bef0e14dffbd86e74d4ba9f8d9b9f1fb'
     })
   ],
 })
