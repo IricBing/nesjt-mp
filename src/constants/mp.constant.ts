@@ -11,6 +11,12 @@ export const MpAuthUrl = 'https://api.weixin.qq.com/sns/jscode2session'
 export const ImageSecurityCheckUrl = 'https://api.weixin.qq.com/wxa/img_sec_check';
 
 /**
+ * 小程序校验文本内容是否含有违法违规内容 请求URL
+ * 文档详见：https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/sec-check/security.msgSecCheck.html
+ */
+export const MessageSecurityCheckUrl = 'https://api.weixin.qq.com/wxa/msg_sec_check';
+
+/**
  * 获取小程序全局唯一后台接口调用凭据 access_token
  * 文档详见：https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html
  */

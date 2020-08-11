@@ -4,11 +4,12 @@ import { IConfig } from "../interfaces/config.interface";
 import { ConfigProvider } from "../constants/common.constant";
 import { IMpUserInfo } from "../interfaces/mp-user-info.interface";
 import { IResolveMpTempCodeRes } from "../interfaces/resolve-mp-temp-code.res.interface";
-import { MpAuthUrl, ImageSecurityCheckUrl } from "../constants/mp.constant";
+import { MpAuthUrl, ImageSecurityCheckUrl, MessageSecurityCheckUrl } from "../constants/mp.constant";
 import { IricUtil } from "../utils/iric.util";
 import { ICheckImageSecurityRes } from "../interfaces/check-image-security-res.interface";
 import * as FormData from 'form-data'
 import { v4 as uuid } from 'uuid'
+import { ICheckMessageSecurityRes } from "../interfaces/check-message-security-res.interface";
 
 @Injectable()
 export class MpService {
@@ -71,6 +72,29 @@ export class MpService {
       const { data } = await this.httpService.post<ICheckImageSecurityRes>(ImageSecurityCheckUrl, form, {
         params: { access_token: await this.mpUtil.getAccessToken() },
         headers: Object.assign({ 'Content-Length': form.getLengthSync() }, form.getHeaders())
+      }).toPromise();
+
+      return {
+        success: true,
+        security: data.errcode ? false : true,
+        errorMessage: data.errcode ? data.errmsg : undefined
+      }
+    } catch (error) {
+      return {
+        success: false,
+        errorMessage: this.iricUtil.parseError(error)
+      }
+    }
+  }
+
+  /**
+   * 文本内容敏感信息检测
+   * @param content 文本内容
+   */
+  async messageSecurityCheck(content: string): Promise<{ success: boolean, security?: boolean, errorMessage?: string }> {
+    try {
+      const { data } = await this.httpService.post<ICheckMessageSecurityRes>(MessageSecurityCheckUrl, { content }, {
+        params: { access_token: await this.mpUtil.getAccessToken() }
       }).toPromise();
 
       return {
