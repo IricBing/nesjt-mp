@@ -8,8 +8,8 @@ describe('AliExpressService', () => {
   beforeAll(async () => {
     const testModule = await Test.createTestingModule({
       imports: [MpModule.forRoot({
-        appId: 'wxe328e6e4f1a0c377',
-        appSecret: '16c48929fa98e9947265d00fc325a8b3',
+        appId: '',
+        appSecret: '',
       })]
     }).compile();
     await testModule.init();
