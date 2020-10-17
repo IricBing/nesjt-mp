@@ -27,7 +27,7 @@ export class AppModule { }
 
 ### 小程序登录
 ```typescript
-import { Body, Controller, HttpStatus, Post, Res } from "@nestjs/common";
+import { Body, Controller, HttpStatus, Post, HttpStatus, HttpException } from "@nestjs/common";
 import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Response } from 'express';
 import { LantUtil } from "../../../utils/lant.util";
@@ -35,7 +35,7 @@ import { SystemLogAppender } from "../../log/constants/log.constant";
 import { LogService } from "../../log/services/log.service";
 import { LoginMpReqDto } from "../dtos/mp/login.mp.req.dto";
 import { LoginMpResDto } from "../dtos/mp/login.mp.res.dto";
-import { MpService } from "@lantsang/nestjs-mp";
+import { MpService } from "@iricbing/nestjs-mp";
 
 @ApiTags('user')
 @Controller('mp/users')
@@ -49,15 +49,16 @@ export class UserMpController {
   @ApiOperation({ summary: '小程序用户登录' })
   @ApiOkResponse({ description: '用户token信息', type: LoginMpResDto })
   @Post('login')
-  async login(@Body() body: LoginMpReqDto, @Res() res: Response) {
+  async login(@Body() body: LoginMpReqDto):Promise<LoginMpResDto> {
     try {
       const { success, userInfo, errorMessage } = await this.mpService.login(body.temp_code, body.raw_data, body.signature, body.encrypted_data, body.iv);
 
       console.log(success, userInfo, errorMessage)
-      return res.status(HttpStatus.OK).send('hello');
+      return null;
     } catch (error) {
-      this.logService.fatal(SystemLogAppender.user, `Mp user login by ${JSON.stringify(body)} failed and error is ${error}`, this.lantUtil.parseError(error));
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
+      if (error instanceof HttpException) throw error;
+      this.logService.fatal(SystemLogAppender.user, `Mp user login by ${JSON.stringify(body)} failed and error is ${error}` , this.lantUtil.parseError(error));
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
