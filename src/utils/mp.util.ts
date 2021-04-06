@@ -1,31 +1,35 @@
-import { Injectable, OnModuleInit, Inject, HttpService } from "@nestjs/common";
-import { createDecipheriv, createHash } from "crypto";
-import { IMpUserInfo } from "../interfaces/mp-user-info.interface";
-import { AccessTokenConfig } from "../interfaces/access-token.interface";
-import { AccessTokenConfigProvider, ConfigProvider } from "../constants/common.constant";
-import { existsSync, readFileSync, writeFileSync } from "fs";
-import { join } from "path";
-import { IGetAccessTokenRes } from "../interfaces/get-access-token-res.interface";
-import { GetAccessTokenUrl } from "../constants/mp.constant";
-import { IConfig } from "../interfaces/config.interface";
+import { Injectable, OnModuleInit, Inject, HttpService } from '@nestjs/common';
+import { createDecipheriv, createHash } from 'crypto';
+import { IMpUserInfo } from '../interfaces/mp-user-info.interface';
+import { AccessTokenConfig } from '../interfaces/access-token.interface';
+import { AccessTokenConfigProvider, ConfigProvider } from '../constants/common.constant';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
+import { IGetAccessTokenRes } from '../interfaces/get-access-token-res.interface';
+import { GetAccessTokenUrl } from '../constants/mp.constant';
+import { IConfig } from '../interfaces/config.interface';
 
 @Injectable()
 export class MpUtil implements OnModuleInit {
   constructor(
-    @Inject(ConfigProvider) private readonly config: IConfig,
-    @Inject(AccessTokenConfigProvider) private readonly accessTokenConfig: AccessTokenConfig,
-    @Inject(HttpService) private readonly httpService: HttpService
-  ) { }
+    @Inject(ConfigProvider)
+    private readonly config: IConfig,
+    @Inject(AccessTokenConfigProvider)
+    private readonly accessTokenConfig: AccessTokenConfig,
+    @Inject(HttpService)
+    private readonly httpService: HttpService
+  ) {}
 
   /** access token 本地存储文件路径 */
   private readonly accessTokenFileName = './access_token.txt';
 
   async onModuleInit() {
-    const exist = existsSync(join(__dirname, this.accessTokenFileName))
+    const exist = existsSync(join(__dirname, this.accessTokenFileName));
     if (exist) {
       const fileContent = readFileSync(join(__dirname, this.accessTokenFileName)).toString();
-      const config: AccessTokenConfig = JSON.parse(fileContent)
-      if (config.ExpiresAt > Date.now() + 60 * 1000) {    //1分钟富裕时间
+      const config: AccessTokenConfig = JSON.parse(fileContent);
+      if (config.ExpiresAt > Date.now() + 60 * 1000) {
+        //1分钟富裕时间
         this.accessTokenConfig.AccessToken = config.AccessToken;
         this.accessTokenConfig.ExpiresAt = config.ExpiresAt;
         return;
@@ -51,7 +55,11 @@ export class MpUtil implements OnModuleInit {
    * @param signature 签名
    */
   checkSignature(sessionKey: string, rawData: string, signature: string): boolean {
-    return createHash('sha1').update(rawData + sessionKey).digest('hex') === signature;
+    return (
+      createHash('sha1')
+        .update(rawData + sessionKey)
+        .digest('hex') === signature
+    );
   }
 
   /**
@@ -76,28 +84,29 @@ export class MpUtil implements OnModuleInit {
 
       const result: IMpUserInfo = JSON.parse(decoded);
 
-      if (result.watermark.appid !== appId)
-        throw new Error('Illegal AppId')
+      if (result.watermark.appid !== appId) throw new Error('Illegal AppId');
 
       return result;
     } catch (err) {
-      throw new Error('Illegal Buffer')
+      throw new Error('Illegal Buffer');
     }
   }
 
   /** 重新获取access token */
   private async renewAccessToken() {
-    const { data } = await this.httpService.get<IGetAccessTokenRes>(GetAccessTokenUrl, {
-      params: {
-        appid: this.config.appId,
-        secret: this.config.appSecret,
-        grant_type: 'client_credential'
-      }
-    }).toPromise();
+    const { data } = await this.httpService
+      .get<IGetAccessTokenRes>(GetAccessTokenUrl, {
+        params: {
+          appid: this.config.appId,
+          secret: this.config.appSecret,
+          grant_type: 'client_credential'
+        }
+      })
+      .toPromise();
 
     if (!data || data.errcode) throw new Error(`Get access token failed and error code is ${data.errcode} error message is ${data.errmsg}`);
 
-    const fileContent = JSON.stringify({ AccessToken: data.access_token, ExpiresAt: Date.now() + data.expires_in * 1000 })
+    const fileContent = JSON.stringify({ AccessToken: data.access_token, ExpiresAt: Date.now() + data.expires_in * 1000 });
     writeFileSync(join(__dirname, this.accessTokenFileName), fileContent);
     this.accessTokenConfig.AccessToken = data.access_token;
     this.accessTokenConfig.ExpiresAt = Date.now() + data.expires_in * 1000;

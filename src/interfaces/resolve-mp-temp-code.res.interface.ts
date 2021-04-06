@@ -1,8 +1,7 @@
-import { IBaseRes } from "./base.res.interface";
+import { IBaseRes } from './base.res.interface';
 
 /** 小程序服务器校验临时code返回 */
 export interface IResolveMpTempCodeRes extends IBaseRes {
-
   /** 用户唯一标识 */
   openid: string;
 

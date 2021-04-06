@@ -1,5 +1,5 @@
 /** 配置Provider */
-export const ConfigProvider = 'ConfigProvider';
+export const ConfigProvider = Symbol('ConfigProvider');
 
 /** Access Token 配置Provider */
-export const AccessTokenConfigProvider = 'AccessTokenConfigProvider'
+export const AccessTokenConfigProvider = Symbol('AccessTokenConfigProvider');

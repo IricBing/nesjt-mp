@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class IricUtil {
@@ -7,6 +7,6 @@ export class IricUtil {
    * @param error 错误信息
    */
   parseError(error: any): string {
-    return (typeof error === 'string' || error instanceof String) ? `${error}` : (JSON.stringify(error) === '{}' ? error.toString() : JSON.stringify(error));
+    return typeof error === 'string' || error instanceof String ? `${error}` : JSON.stringify(error) === '{}' ? error.toString() : JSON.stringify(error);
   }
 }

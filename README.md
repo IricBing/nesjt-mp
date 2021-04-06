@@ -1,17 +1,23 @@
 # nestjs 小程序插件
+
 注意：<font color="#dd0000">仍在开发中，目前仅在内部使用</font><br /> 
 
 ## 使用说明
+
 外部人员仅供参考，请不要用于生产环境，因此导致的事故后果请自行承担。
 
 ### 安装
-`$ npm i @lantsang/nestjs-mp` <br />
-or <br />
-`$ yarn add @lantsang/nestjs-mp`<br />
-推荐使用yarn
+
+``` shell
+$ npm i @lantsang/nestjs-mp
+
+or
+$ yarn add @lantsang/nestjs-mp  # 推荐使用yarn
+```
 
 ### 配置
-```typescript
+
+``` typescript
 import { MpModule } from '@lantsang/nestjs-mp'
 
 @Module({
@@ -26,7 +32,8 @@ export class AppModule { }
 ```
 
 ### 小程序登录
-```typescript
+
+``` typescript
 import { Body, Controller, HttpStatus, Post, Res } from "@nestjs/common";
 import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Response } from 'express';
@@ -64,4 +71,5 @@ export class UserMpController {
 ```
 
 ### 特殊说明
-- 登录时，小程序模拟器第一次调用会出现签名校验失败的错误，之后都是正常的，因此在调用login的接口中最后一个参数为默认参数，默认检查签名，可设置为false不去校验。
+
+* 登录时，小程序模拟器第一次调用会出现签名校验失败的错误，之后都是正常的，因此在调用login的接口中最后一个参数为默认参数，默认检查签名，可设置为false不去校验。

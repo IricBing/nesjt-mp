@@ -2,7 +2,7 @@
  * 小程序解析Temp Code 请求URL
  * 文档详见：https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html
  */
-export const MpAuthUrl = 'https://api.weixin.qq.com/sns/jscode2session'
+export const MpAuthUrl = 'https://api.weixin.qq.com/sns/jscode2session';
 
 /**
  * 小程序校验一张图片是否含有违法违规内容 请求URL
@@ -21,4 +21,3 @@ export const MessageSecurityCheckUrl = 'https://api.weixin.qq.com/wxa/msg_sec_ch
  * 文档详见：https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html
  */
 export const GetAccessTokenUrl = 'https://api.weixin.qq.com/cgi-bin/token';
-

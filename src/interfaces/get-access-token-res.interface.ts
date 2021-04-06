@@ -1,7 +1,7 @@
-import { IBaseRes } from "./base.res.interface";
+import { IBaseRes } from './base.res.interface';
 
 /** http请求微信服务器获取Access Token返回数据格式 */
-export interface IGetAccessTokenRes extends IBaseRes{
+export interface IGetAccessTokenRes extends IBaseRes {
   /** 获取到的凭证 */
   access_token: string;
 
