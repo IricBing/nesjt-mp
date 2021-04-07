@@ -1,7 +1,7 @@
 {
   "name": "@lantsang/nestjs-mp",
   "version": "1.0.0",
-  "description": "自用nestjs 小程序插件",
+  "description": "自用 nestjs 微信小程序插件",
   "author": "Iric<iricbing@gmail.com>",
   "license": "MIT",
   "files": [
@@ -12,6 +12,8 @@
   "keywords": [
     "nestjs",
     "微信小程序",
+    "wechat",
+    "miniprogram",
     "typescript"
   ],
   "scripts": {

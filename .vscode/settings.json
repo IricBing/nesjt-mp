@@ -37,10 +37,12 @@
     "errmsg",
     "iricbing",
     "lantsang",
+    "miniprogram",
     "nestjs",
     "openid",
     "prebuild",
     "setex",
-    "unionid"
+    "unionid",
+    "wechat"
   ]
 }
