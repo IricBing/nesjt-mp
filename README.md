@@ -77,7 +77,6 @@ export class AppModule { }
 ``` typescript
 import { Body, Controller, HttpStatus, Post, Res } from "@nestjs/common";
 import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { Response } from 'express';
 import { LantUtil } from "../../../utils/lant.util";
 import { SystemLogAppender } from "../../log/constants/log.constant";
 import { LogService } from "../../log/services/log.service";
@@ -104,8 +103,9 @@ export class UserMpController {
       console.log(success, userInfo, errorMessage)
       return 'hello world';
     } catch (error) {
-      this.logService.fatal(SystemLogAppender.user, `Mp user login by ${JSON.stringify(body)} failed and error is ${error}`, this.lantUtil.parseError(error));
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
+      if (error instanceof HttpException) throw error;
+      this.logService.fatal(SystemLogAppender.User, `Mp user login by ${JSON.stringify(body)} failed and error is ${error}`, this.lantUtil.parseError(error));
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
