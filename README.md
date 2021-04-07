@@ -1,10 +1,14 @@
-# nestjs 小程序插件
+# `nestjs` 小程序插件
 
 注意：<font color="#dd0000">仍在开发中，目前仅在内部使用</font><br /> 
 
 ## 使用说明
 
 外部人员仅供参考，请不要用于生产环境，因此导致的事故后果请自行承担。
+
+### 支持环境
+
+* node >=`14.x`
 
 ### 安装
 
@@ -17,19 +21,56 @@ $ yarn add @lantsang/nestjs-mp  # 推荐使用yarn
 
 ### 配置
 
+#### 同步方式
+
 ``` typescript
+import { Module } from '@nestjs/common';
 import { MpModule } from '@lantsang/nestjs-mp'
 
 @Module({
   imports: [
     MpModule.forRoot({
-      appId: config.MiniProgram.AppId, // 小程序appid
-      appSecret: config.MiniProgram.AppSecret //小程序app secret
+      appId: '小程序appid', 
+      appSecret: '小程序app secret',
+      redisOptions: {   // redisOptions 参数选填
+        host:'localhost',
+        port:6379,
+        db:1,
+        password:'',
+        keyPrefix:'mp-'
+      }
     })
   ]
 })
 export class AppModule { }
 ```
+
+#### 异步方式
+
+``` typescript
+import { Module } from '@nestjs/common';
+import { MpModule } from '@lantsang/nestjs-mp'
+import { ConfigModule } from './modules/config/config.module';
+import { CONFIG_PROVIDER } from './modules/config/constants/config.constant';
+import { ConfigService } from './modules/config/services/config.service';
+
+@Module({
+  imports: [
+    MpModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        appId: configService.mp.appId,
+        appSecret: configService.mp.appSecret,
+        redisOptions: configService.redis.mp  // redisOptions 参数选填
+      }),
+      inject: [CONFIG_PROVIDER]
+    }),
+    ConfigModule
+  ]
+})
+export class AppModule { }
+```
+
+> 提示：异步注册方式采用的 `ConfigModule` 并不是 `NestJS` 自带的配置功能，而是我基于官方自己设计的一套，具体实现请参考笔记：[NestJS配置模块设计](https://github.com/IricBing/note/blob/master/NodeJS/NestJS/%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/%E9%85%8D%E7%BD%AE%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1/README.md)
 
 ### 小程序登录
 
@@ -56,12 +97,12 @@ export class UserMpController {
   @ApiOperation({ summary: '小程序用户登录' })
   @ApiOkResponse({ description: '用户token信息', type: LoginMpResDto })
   @Post('login')
-  async login(@Body() body: LoginMpReqDto, @Res() res: Response) {
+  async login(@Body() body: LoginMpReqDto) {
     try {
       const { success, userInfo, errorMessage } = await this.mpService.login(body.temp_code, body.raw_data, body.signature, body.encrypted_data, body.iv);
 
       console.log(success, userInfo, errorMessage)
-      return res.status(HttpStatus.OK).send('hello');
+      return 'hello world';
     } catch (error) {
       this.logService.fatal(SystemLogAppender.user, `Mp user login by ${JSON.stringify(body)} failed and error is ${error}`, this.lantUtil.parseError(error));
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
