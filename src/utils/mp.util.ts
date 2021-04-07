@@ -2,20 +2,24 @@ import { Injectable, OnModuleInit, Inject, HttpService } from '@nestjs/common';
 import { createDecipheriv, createHash } from 'crypto';
 import { IMpUserInfo } from '../interfaces/mp-user-info.interface';
 import { AccessTokenConfig } from '../interfaces/access-token.interface';
-import { AccessTokenConfigProvider, ConfigProvider } from '../constants/common.constant';
+import { ACCESS_TOKEN_CONFIG_PROVIDER, OPTIONS_PROVIDER, REDIS_CLIENT_PROVIDER } from '../constants/common.constant';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { IGetAccessTokenRes } from '../interfaces/get-access-token-res.interface';
-import { GetAccessTokenUrl } from '../constants/mp.constant';
-import { IConfig } from '../interfaces/config.interface';
+import { GET_ACCESS_TOKEN_URL } from '../constants/mp.constant';
+import { MpModuleOptions } from '../interfaces/options.interface';
+import { Redis } from 'ioredis';
+import { ACCESS_TOKEN_REDIS_KEY } from '../constants/redis.constant';
 
 @Injectable()
 export class MpUtil implements OnModuleInit {
   constructor(
-    @Inject(ConfigProvider)
-    private readonly config: IConfig,
-    @Inject(AccessTokenConfigProvider)
+    @Inject(OPTIONS_PROVIDER)
+    private readonly options: MpModuleOptions,
+    @Inject(ACCESS_TOKEN_CONFIG_PROVIDER)
     private readonly accessTokenConfig: AccessTokenConfig,
+    @Inject(REDIS_CLIENT_PROVIDER)
+    private readonly redisClient: Redis,
     @Inject(HttpService)
     private readonly httpService: HttpService
   ) {}
@@ -24,14 +28,15 @@ export class MpUtil implements OnModuleInit {
   private readonly accessTokenFileName = './access_token.txt';
 
   async onModuleInit() {
+    if (this.redisClient) return; // 采用redis模式时，直接退出
     const exist = existsSync(join(__dirname, this.accessTokenFileName));
     if (exist) {
       const fileContent = readFileSync(join(__dirname, this.accessTokenFileName)).toString();
-      const config: AccessTokenConfig = JSON.parse(fileContent);
-      if (config.ExpiresAt > Date.now() + 60 * 1000) {
+      const options: AccessTokenConfig = JSON.parse(fileContent);
+      if (options.ExpiresAt > Date.now() + 60 * 1000) {
         //1分钟富裕时间
-        this.accessTokenConfig.AccessToken = config.AccessToken;
-        this.accessTokenConfig.ExpiresAt = config.ExpiresAt;
+        this.accessTokenConfig.AccessToken = options.AccessToken;
+        this.accessTokenConfig.ExpiresAt = options.ExpiresAt;
         return;
       }
     }
@@ -41,6 +46,11 @@ export class MpUtil implements OnModuleInit {
 
   /** 获取Access Token */
   async getAccessToken(): Promise<string> {
+    if (this.redisClient) {
+      const accessToken = await this.redisClient.get(ACCESS_TOKEN_REDIS_KEY);
+      return accessToken ?? this.renewAccessToken();
+    }
+
     if (!this.accessTokenConfig || !this.accessTokenConfig.AccessToken || this.accessTokenConfig.ExpiresAt < Date.now() + 60 * 1000) {
       await this.renewAccessToken();
       return this.accessTokenConfig.AccessToken;
@@ -93,12 +103,12 @@ export class MpUtil implements OnModuleInit {
   }
 
   /** 重新获取access token */
-  private async renewAccessToken() {
+  private async renewAccessToken(): Promise<string> {
     const { data } = await this.httpService
-      .get<IGetAccessTokenRes>(GetAccessTokenUrl, {
+      .get<IGetAccessTokenRes>(GET_ACCESS_TOKEN_URL, {
         params: {
-          appid: this.config.appId,
-          secret: this.config.appSecret,
+          appid: this.options.appId,
+          secret: this.options.appSecret,
           grant_type: 'client_credential'
         }
       })
@@ -106,9 +116,15 @@ export class MpUtil implements OnModuleInit {
 
     if (!data || data.errcode) throw new Error(`Get access token failed and error code is ${data.errcode} error message is ${data.errmsg}`);
 
-    const fileContent = JSON.stringify({ AccessToken: data.access_token, ExpiresAt: Date.now() + data.expires_in * 1000 });
-    writeFileSync(join(__dirname, this.accessTokenFileName), fileContent);
-    this.accessTokenConfig.AccessToken = data.access_token;
-    this.accessTokenConfig.ExpiresAt = Date.now() + data.expires_in * 1000;
+    if (this.redisClient) {
+      await this.redisClient.setex(ACCESS_TOKEN_REDIS_KEY, data.expires_in, data.access_token);
+    } else {
+      const fileContent = JSON.stringify({ AccessToken: data.access_token, ExpiresAt: Date.now() + data.expires_in * 1000 });
+      writeFileSync(join(__dirname, this.accessTokenFileName), fileContent);
+      this.accessTokenConfig.AccessToken = data.access_token;
+      this.accessTokenConfig.ExpiresAt = Date.now() + data.expires_in * 1000;
+    }
+
+    return data.access_token;
   }
 }

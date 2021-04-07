@@ -1,24 +1,30 @@
-import { Module, DynamicModule, Global, HttpModule } from '@nestjs/common';
-import { IConfig } from './interfaces/config.interface';
-import { MpService } from './services/mp.service';
-import { ConfigProvider, AccessTokenConfigProvider } from './constants/common.constant';
-import { MpUtil } from './utils/mp.util';
-import { IricUtil } from './utils/iric.util';
-import { AccessTokenConfig } from './interfaces/access-token.interface';
+import { Module, DynamicModule } from '@nestjs/common';
+import { MpModuleAsyncOptions, MpModuleOptions } from './interfaces/options.interface';
+import { MpCoreModule } from './mp-core.module';
 
-@Global()
 @Module({})
 export class MpModule {
-  static forRoot(config: IConfig): DynamicModule {
-    const accessTokenConfig: AccessTokenConfig = {
-      AccessToken: '',
-      ExpiresAt: null
-    };
+  /**
+   * 同步方式配置
+   * @param options 配置信息
+   * @returns 动态模块
+   */
+  static forRoot(options: MpModuleOptions): DynamicModule {
     return {
       module: MpModule,
-      imports: [HttpModule],
-      providers: [MpUtil, MpService, IricUtil, { provide: ConfigProvider, useValue: config }, { provide: AccessTokenConfigProvider, useValue: accessTokenConfig }],
-      exports: [MpService]
+      imports: [MpCoreModule.forRoot(options)]
+    };
+  }
+
+  /**
+   * 异步方式配置
+   * @param options 配置信息
+   * @returns 动态模块
+   */
+  static forRootAsync(options: MpModuleAsyncOptions): DynamicModule {
+    return {
+      module: MpModule,
+      imports: [MpCoreModule.forRootAsync(options)]
     };
   }
 }

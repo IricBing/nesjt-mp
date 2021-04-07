@@ -1,10 +1,10 @@
 import { Injectable, Inject, HttpService } from '@nestjs/common';
 import { MpUtil } from '../utils/mp.util';
-import { IConfig } from '../interfaces/config.interface';
-import { ConfigProvider } from '../constants/common.constant';
+import { MpModuleOptions } from '../interfaces/options.interface';
+import { OPTIONS_PROVIDER } from '../constants/common.constant';
 import { IMpUserInfo } from '../interfaces/mp-user-info.interface';
 import { IResolveMpTempCodeRes } from '../interfaces/resolve-mp-temp-code.res.interface';
-import { MpAuthUrl, ImageSecurityCheckUrl, MessageSecurityCheckUrl } from '../constants/mp.constant';
+import { MP_AUTH_URL, IMAGE_SECURITY_CHECK_URL, MESSAGE_SECURITY_CHECK_URL } from '../constants/mp.constant';
 import { IricUtil } from '../utils/iric.util';
 import { ICheckImageSecurityRes } from '../interfaces/check-image-security-res.interface';
 import * as FormData from 'form-data';
@@ -14,8 +14,8 @@ import { ICheckMessageSecurityRes } from '../interfaces/check-message-security-r
 @Injectable()
 export class MpService {
   constructor(
-    @Inject(ConfigProvider)
-    private readonly config: IConfig,
+    @Inject(OPTIONS_PROVIDER)
+    private readonly config: MpModuleOptions,
     @Inject(HttpService)
     private readonly httpService: HttpService,
     private readonly mpUtil: MpUtil,
@@ -41,7 +41,7 @@ export class MpService {
   ): Promise<{ success: boolean; userInfo?: IMpUserInfo; errorMessage?: string }> {
     try {
       const { data } = await this.httpService
-        .get<IResolveMpTempCodeRes>(MpAuthUrl, {
+        .get<IResolveMpTempCodeRes>(MP_AUTH_URL, {
           params: {
             appid: this.config.appId,
             secret: this.config.appSecret,
@@ -80,7 +80,7 @@ export class MpService {
       form.append('type', 'image');
       form.append('media', media, uuid());
       const { data } = await this.httpService
-        .post<ICheckImageSecurityRes>(ImageSecurityCheckUrl, form, {
+        .post<ICheckImageSecurityRes>(IMAGE_SECURITY_CHECK_URL, form, {
           params: { access_token: await this.mpUtil.getAccessToken() },
           headers: Object.assign({ 'Content-Length': form.getLengthSync() }, form.getHeaders())
         })
@@ -89,7 +89,7 @@ export class MpService {
       return {
         success: true,
         security: !data.errcode,
-        errorMessage: data?.errmsg
+        errorMessage: data.errcode ? data.errmsg : undefined
       };
     } catch (error) {
       return {
@@ -107,7 +107,7 @@ export class MpService {
     try {
       const { data } = await this.httpService
         .post<ICheckMessageSecurityRes>(
-          MessageSecurityCheckUrl,
+          MESSAGE_SECURITY_CHECK_URL,
           { content },
           {
             params: { access_token: await this.mpUtil.getAccessToken() }
@@ -118,7 +118,7 @@ export class MpService {
       return {
         success: true,
         security: !data.errcode,
-        errorMessage: data?.errmsg
+        errorMessage: data.errcode ? data.errmsg : undefined
       };
     } catch (error) {
       return {
