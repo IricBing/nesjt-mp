@@ -1,22 +1,30 @@
 # source
 **/*.ts
 *.ts
-config
 src
 test
-.env
 
 # definitions
 !**/*.d.ts
 !*.d.ts
 
+# docs
+docs
+
 # configuration
+.husky
+.vscode
+.gitignore
+.eslintrc.js
+.lintstagedrc.json
+.nvmrc
 .prettierrc
+.env
+.env.development
 nest-cli.json
 nodemon-debug.json
 package-lock.json
 tsconfig.json
+tsconfig.build.json
+tsconfig.npm.build.json
 tsconfig.spec.json
-tslint.json
-webpack.config.js
-yarn.lock
