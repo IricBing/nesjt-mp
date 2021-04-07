@@ -6,10 +6,10 @@ import { ConfigService } from './modules/config/services/config.service';
 
 @Module({
   imports: [
-    MpModule.forRoot({
-      appId: '你的appId',
-      appSecret: '你的appSecret'
-    }),
+    // MpModule.forRoot({
+    //   appId: '你的appId',
+    //   appSecret: '你的appSecret'
+    // }),
     MpModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         appId: configService.mp.appId,
