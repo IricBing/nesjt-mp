@@ -4,6 +4,7 @@ import { ConfigService } from './services/config.service';
 import { ConfigValidation } from './validations/config.validation';
 import { RedisConfigRegister } from './registers/redis.register';
 import { CONFIG_PROVIDER } from './constants/config.constant';
+import { MpRegister } from './registers/mp.register';
 
 @Global()
 @Module({
@@ -14,7 +15,7 @@ import { CONFIG_PROVIDER } from './constants/config.constant';
         allowUnknown: true,
         abortEarly: true
       },
-      load: [RedisConfigRegister]
+      load: [RedisConfigRegister, MpRegister]
     })
   ],
   providers: [

@@ -5,6 +5,9 @@
 # access_token文本
 /src/utils/access_token.txt
 
+# 本地配置文件
+.env
+
 # Logs
 logs
 *.log

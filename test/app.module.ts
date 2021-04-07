@@ -6,14 +6,14 @@ import { ConfigService } from './modules/config/services/config.service';
 
 @Module({
   imports: [
-    // MpModule.forRoot({
-    //   appId: 'wxb5ebf49003e967e3',
-    //   appSecret: 'bef0e14dffbd86e74d4ba9f8d9b9f1fb'
-    // }),
+    MpModule.forRoot({
+      appId: '你的appId',
+      appSecret: '你的appSecret'
+    }),
     MpModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
-        appId: 'wxb5ebf49003e967e3',
-        appSecret: 'bef0e14dffbd86e74d4ba9f8d9b9f1fb',
+        appId: configService.mp.appId,
+        appSecret: configService.mp.appSecret,
         redisOptions: configService.redis.mp
       }),
       inject: [CONFIG_PROVIDER]

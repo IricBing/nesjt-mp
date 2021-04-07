@@ -6,6 +6,16 @@ import { RedisModuleOptions } from 'nestjs-redis';
 export class ConfigService {
   constructor(private readonly nestConfigService: NestConfigService) {}
 
+  /** 微信小程序配置 */
+  get mp() {
+    return {
+      /** 微信小程序 AppId */
+      appId: this.nestConfigService.get<string>('mp.appId'),
+      /** 微信小程序 AppSecret */
+      appSecret: this.nestConfigService.get<string>('mp.appSecret')
+    };
+  }
+
   /** redis数据库配置 */
   get redis() {
     return {

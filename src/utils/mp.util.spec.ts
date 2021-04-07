@@ -6,35 +6,6 @@ import { ConfigModule } from '../../test/modules/config/config.module';
 import { CONFIG_PROVIDER } from '../../test/modules/config/constants/config.constant';
 import { ConfigService } from '../../test/modules/config/services/config.service';
 
-// describe('MpUtil (sync)', () => {
-//   let app: INestApplication;
-//   let mpUtil: MpUtil;
-
-//   beforeAll(async () => {
-//     const app = await Test.createTestingModule({
-//       imports: [
-//         MpModule.forRoot({
-//           appId: 'wxb5ebf49003e967e3',
-//           appSecret: 'bef0e14dffbd86e74d4ba9f8d9b9f1fb'
-//         })
-//       ]
-//     }).compile();
-//     await app.init();
-//     mpUtil = app.get<MpUtil>(MpUtil);
-//   });
-
-//   afterAll(async () => {
-//     await app.close();
-//   });
-
-//   describe('获取access token', () => {
-//     it('成功', async () => {
-//       const accessToken = await mpUtil.getAccessToken();
-//       expect(accessToken).toBeTruthy();
-//     });
-//   });
-// });
-
 describe('MpUtil (async)', () => {
   let app: INestApplication;
   let mpUtil: MpUtil;
@@ -44,8 +15,8 @@ describe('MpUtil (async)', () => {
       imports: [
         MpModule.forRootAsync({
           useFactory: (configService: ConfigService) => ({
-            appId: 'wxb5ebf49003e967e3',
-            appSecret: 'bef0e14dffbd86e74d4ba9f8d9b9f1fb',
+            appId: configService.mp.appId,
+            appSecret: configService.mp.appSecret,
             redisOptions: configService.redis.mp
           }),
           inject: [CONFIG_PROVIDER]

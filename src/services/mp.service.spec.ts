@@ -4,6 +4,9 @@ import { readFileSync } from 'fs';
 import { INestApplication } from '@nestjs/common';
 import { MpService } from './mp.service';
 import { MpModule } from '../mp.module';
+import { ConfigModule } from '../../test/modules/config/config.module';
+import { CONFIG_PROVIDER } from '../../test/modules/config/constants/config.constant';
+import { ConfigService } from '../../test/modules/config/services/config.service';
 
 describe('MpService', () => {
   let app: INestApplication;
@@ -12,10 +15,15 @@ describe('MpService', () => {
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
       imports: [
-        MpModule.forRoot({
-          appId: 'wxb5ebf49003e967e3',
-          appSecret: 'bef0e14dffbd86e74d4ba9f8d9b9f1fb'
-        })
+        MpModule.forRootAsync({
+          useFactory: (configService: ConfigService) => ({
+            appId: configService.mp.appId,
+            appSecret: configService.mp.appSecret,
+            redisOptions: configService.redis.mp
+          }),
+          inject: [CONFIG_PROVIDER]
+        }),
+        ConfigModule
       ]
     }).compile();
     app = moduleFixture.createNestApplication();
