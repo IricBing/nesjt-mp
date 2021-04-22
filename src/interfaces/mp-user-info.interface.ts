@@ -1,5 +1,5 @@
 /** 解密小程序加密信息得到的用户信息 */
-export interface IMpUserInfo {
+export interface MpUserInfo {
   /** 用户openid */
   openId: string;
 

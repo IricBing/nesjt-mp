@@ -3,6 +3,7 @@
   "compilerOptions": {
     "removeComments": false,
     "sourceMap": false,
+    "incremental": false
   },
   "exclude": [
     "node_modules",

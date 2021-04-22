@@ -1,11 +1,12 @@
 {
   "name": "@lantsang/nestjs-mp",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "自用 nestjs 微信小程序插件",
   "author": "Iric<iricbing@gmail.com>",
   "license": "MIT",
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "yarn.lock"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

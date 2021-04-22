@@ -1,5 +1,5 @@
 /** http请求微信服务器返回基础字段 */
-export interface IBaseRes {
+export interface MpBaseResponse {
   /** 错误码 */
   errcode: number;
 

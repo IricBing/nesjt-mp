@@ -111,6 +111,8 @@ export class UserMpController {
 }
 ```
 
-### 特殊说明
+## 文档地址
 
-* 登录时，小程序模拟器第一次调用会出现签名校验失败的错误，之后都是正常的，因此在调用login的接口中最后一个参数为默认参数，默认检查签名，可设置为false不去校验。
+* [私有Gitlab](https://gitlab.lantsang.cn/nestjs-plugins/nestjs-tencent-iot/tree/master/docs)
+* [GitHub](https://github.com/lantsang/nestjs-tencent-iot/tree/master/docs)
+* [Gitee](https://gitee.com/lantsang/nestjs-tencent-iot/tree/master/docs)

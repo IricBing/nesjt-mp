@@ -1,15 +1,15 @@
 import { Injectable, OnModuleInit, Inject, HttpService } from '@nestjs/common';
 import { createDecipheriv, createHash } from 'crypto';
-import { IMpUserInfo } from '../interfaces/mp-user-info.interface';
+import { MpUserInfo } from '../interfaces/mp-user-info.interface';
 import { AccessTokenConfig } from '../interfaces/access-token.interface';
 import { ACCESS_TOKEN_CONFIG_PROVIDER, OPTIONS_PROVIDER, REDIS_CLIENT_PROVIDER } from '../constants/common.constant';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { IGetAccessTokenRes } from '../interfaces/get-access-token-res.interface';
 import { GET_ACCESS_TOKEN_URL } from '../constants/mp.constant';
 import { MpModuleOptions } from '../interfaces/options.interface';
 import { Redis } from 'ioredis';
 import { ACCESS_TOKEN_REDIS_KEY } from '../constants/redis.constant';
+import { MpGetAccessTokenResponse } from '../interfaces/response/mp/get-access-token.mp.response.interface';
 
 @Injectable()
 export class MpUtil implements OnModuleInit {
@@ -20,7 +20,6 @@ export class MpUtil implements OnModuleInit {
     private readonly accessTokenConfig: AccessTokenConfig,
     @Inject(REDIS_CLIENT_PROVIDER)
     private readonly redisClient: Redis,
-    @Inject(HttpService)
     private readonly httpService: HttpService
   ) {}
 
@@ -79,7 +78,7 @@ export class MpUtil implements OnModuleInit {
    * @param encryptedData 密文
    * @param iv 偏移量
    */
-  decryptData(appId: string, sessionKey: string, encryptedData: string, iv: string): IMpUserInfo {
+  decryptData(appId: string, sessionKey: string, encryptedData: string, iv: string): MpUserInfo {
     const sessionKeyBuf = Buffer.from(sessionKey, 'base64');
     const encryptedDataBuf = Buffer.from(encryptedData, 'base64');
     const ivBuf = Buffer.from(iv, 'base64');
@@ -92,7 +91,7 @@ export class MpUtil implements OnModuleInit {
       let decoded = decipher.update(encryptedDataBuf, 'binary', 'utf8');
       decoded += decipher.final('utf8');
 
-      const result: IMpUserInfo = JSON.parse(decoded);
+      const result: MpUserInfo = JSON.parse(decoded);
 
       if (result.watermark.appid !== appId) throw new Error('Illegal AppId');
 
@@ -105,7 +104,7 @@ export class MpUtil implements OnModuleInit {
   /** 重新获取access token */
   private async renewAccessToken(): Promise<string> {
     const { data } = await this.httpService
-      .get<IGetAccessTokenRes>(GET_ACCESS_TOKEN_URL, {
+      .get<MpGetAccessTokenResponse>(GET_ACCESS_TOKEN_URL, {
         params: {
           appid: this.options.appId,
           secret: this.options.appSecret,

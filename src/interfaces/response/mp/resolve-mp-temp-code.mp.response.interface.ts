@@ -1,7 +1,7 @@
-import { IBaseRes } from './base.res.interface';
+import { MpBaseResponse } from './base.response.mp.interface';
 
 /** 小程序服务器校验临时code返回 */
-export interface IResolveMpTempCodeRes extends IBaseRes {
+export interface MpResolveMpTempCodeResponse extends MpBaseResponse {
   /** 用户唯一标识 */
   openid: string;
 

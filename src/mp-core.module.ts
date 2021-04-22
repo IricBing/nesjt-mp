@@ -4,6 +4,7 @@ import { Redis } from 'ioredis';
 import { ACCESS_TOKEN_CONFIG_PROVIDER, OPTIONS_PROVIDER, REDIS_CLIENT_PROVIDER } from './constants/common.constant';
 import { MpModuleAsyncOptions, MpModuleOptions, MpOptionsFactory } from './interfaces/options.interface';
 import { createRedisClientProvider } from './providers/redis-client.provider';
+import { MpCheckSecurityService } from './services/check-security.service';
 import { MpService } from './services/mp.service';
 import { IricUtil } from './utils/iric.util';
 import { MpUtil } from './utils/mp.util';
@@ -23,14 +24,15 @@ export class MpCoreModule implements OnModuleDestroy {
       module: MpCoreModule,
       imports: [HttpModule],
       providers: [
-        MpUtil,
         MpService,
+        MpCheckSecurityService,
+        MpUtil,
         IricUtil,
         createRedisClientProvider(),
         { provide: OPTIONS_PROVIDER, useValue: options },
         { provide: ACCESS_TOKEN_CONFIG_PROVIDER, useValue: { AccessToken: '', ExpiresAt: null } }
       ],
-      exports: [MpService]
+      exports: [MpService, MpCheckSecurityService]
     };
   }
 
@@ -44,8 +46,16 @@ export class MpCoreModule implements OnModuleDestroy {
     return {
       module: MpCoreModule,
       imports: [...(options.imports || []), HttpModule],
-      providers: [...asyncProviders, MpUtil, MpService, IricUtil, createRedisClientProvider(), { provide: ACCESS_TOKEN_CONFIG_PROVIDER, useValue: { AccessToken: '', ExpiresAt: null } }],
-      exports: [MpService]
+      providers: [
+        ...asyncProviders,
+        MpService,
+        MpCheckSecurityService,
+        MpUtil,
+        IricUtil,
+        createRedisClientProvider(),
+        { provide: ACCESS_TOKEN_CONFIG_PROVIDER, useValue: { AccessToken: '', ExpiresAt: null } }
+      ],
+      exports: [MpService, MpCheckSecurityService]
     };
   }
 
