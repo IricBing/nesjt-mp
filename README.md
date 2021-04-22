@@ -72,45 +72,6 @@ export class AppModule { }
 
 > 提示：异步注册方式采用的 `ConfigModule` 并不是 `NestJS` 自带的配置功能，而是我基于官方自己设计的一套，具体实现请参考笔记：[NestJS配置模块设计](https://github.com/IricBing/note/blob/master/NodeJS/NestJS/%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/%E9%85%8D%E7%BD%AE%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1/README.md)
 
-### 小程序登录
-
-``` typescript
-import { Body, Controller, HttpStatus, Post, Res } from "@nestjs/common";
-import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { LantUtil } from "../../../utils/lant.util";
-import { SystemLogAppender } from "../../log/constants/log.constant";
-import { LogService } from "../../log/services/log.service";
-import { LoginMpReqDto } from "../dtos/mp/login.mp.req.dto";
-import { LoginMpResDto } from "../dtos/mp/login.mp.res.dto";
-import { MpService } from "@lantsang/nestjs-mp";
-
-@ApiTags('user')
-@Controller('mp/users')
-export class UserMpController {
-  constructor(
-    private readonly mpService: MpService,
-    private readonly logService: LogService,
-    private readonly lantUtil: LantUtil
-  ) { }
-
-  @ApiOperation({ summary: '小程序用户登录' })
-  @ApiOkResponse({ description: '用户token信息', type: LoginMpResDto })
-  @Post('login')
-  async login(@Body() body: LoginMpReqDto) {
-    try {
-      const { success, userInfo, errorMessage } = await this.mpService.login(body.temp_code, body.raw_data, body.signature, body.encrypted_data, body.iv);
-
-      console.log(success, userInfo, errorMessage)
-      return 'hello world';
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      this.logService.fatal(SystemLogAppender.User, `Mp user login by ${JSON.stringify(body)} failed and error is ${error}`, this.lantUtil.parseError(error));
-      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-}
-```
-
 ## 文档地址
 
 * [私有Gitlab](https://gitlab.lantsang.cn/nestjs-plugins/nestjs-tencent-iot/tree/master/docs)
