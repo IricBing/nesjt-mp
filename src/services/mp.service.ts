@@ -47,6 +47,6 @@ export class MpService {
 
     const userInfo = this.mpUtil.decryptData(this.options.appId, data.session_key, encryptedData, iv);
 
-    return { success: true, data: userInfo };
+    return { success: true, data: Object.assign(userInfo, { openId: data.openid, unionId: data.unionid }) };
   }
 }
